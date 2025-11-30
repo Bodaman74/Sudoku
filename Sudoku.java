@@ -17,10 +17,10 @@ public class Sudoku {
         // TODO code application logic here
         int[][] board = {
             {1,2,3,4,5,6,7,8,9},
-            {1,2,3,4,5,6,7,8,9}, 
+            {1,1,1,4,5,6,7,8,9}, 
             {3,4,5,6,7,8,9,1,2},
             {4,5,6,7,8,9,1,2,3},
-            {5,6,7,8,9,1,2,3,4},
+            {5,6,6,8,9,1,2,3,4},
             {6,7,8,9,1,2,3,4,5},
             {7,8,9,1,2,3,4,5,6},
             {8,9,1,2,3,4,5,6,7},
@@ -28,7 +28,7 @@ public class Sudoku {
         };
 
         
-        RowValidator validator = new RowValidator(board);
+        RowValidatorManager validator = new RowValidatorManager(board);
 
        
         System.out.println("=== Mode 0 (Sequential) ===");
