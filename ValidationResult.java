@@ -1,35 +1,45 @@
+
 package sudoku;
 
 import java.util.*;
 
 public class ValidationResult {
-    private String type;
-    private int index;
-    private boolean valid;
-    private Map<Integer, List<Integer>> duplicates;
+    private final Map<Integer, List<String>> details = new HashMap<>();
 
-    public ValidationResult(String type, int index, boolean valid, Map<Integer, List<Integer>> duplicates) {
-        this.type = type;
-        this.index = index;
-        this.valid = valid;
-        this.duplicates = duplicates;
+    
+    public void addInvalidRow(int rowIndex, String reason) {
+        details.computeIfAbsent(rowIndex, k -> new ArrayList<>()).add(reason);
     }
 
-    public boolean isValid() {
-        return valid;
+    
+    public boolean allValid() {
+        return details.isEmpty();
     }
 
-    public int getUnitIndex() {
-        return index;
+    
+    public List<Integer> getInvalidRows() {
+        List<Integer> rows = new ArrayList<>(details.keySet());
+        Collections.sort(rows); 
+        return Collections.unmodifiableList(rows);
     }
 
+    
+    public List<String> getDetails(int rowIndex) {
+        return details.getOrDefault(rowIndex, Collections.emptyList());
+    }
+
+    @Override
     public String toString() {
-        if (valid) return type + " " + index + ": VALID";
-        StringBuilder s = new StringBuilder();
-        for (Integer v : duplicates.keySet()) {
-            if (s.length() > 0) s.append("\n");
-            s.append(type + " " + index + ", #" + v + ", " + duplicates.get(v));
+        if (allValid()) return "All rows are VALID.";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("INVALID rows found: ").append(details.size()).append("\n");
+
+        for (int r : getInvalidRows()) {
+            for (String reason : details.get(r)) {
+                sb.append(reason).append("\n");
+            }
         }
-        return s.toString();
+        return sb.toString();
     }
 }
