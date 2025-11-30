@@ -3,57 +3,42 @@ package sudoku;
 import java.util.*;
 
 public class ValidationResult {
-
     private final Map<Integer, List<String>> details = new HashMap<>();
-    
-
-
-
 
     public void addInvalidRow(int rowIndex, String reason) {
         details.computeIfAbsent(rowIndex, k -> new ArrayList<>()).add(reason);
     }
 
-
     public boolean allValid() {
         return details.isEmpty();
     }
 
-
     public List<Integer> getInvalidRows() {
-        List<Integer> rows = new ArrayList<>(details.keySet());
-        Collections.sort(rows);
-        return Collections.unmodifiableList(rows);
+        return new ArrayList<>(details.keySet());
     }
 
-
-    public List<String> getDetails(int rowIndex) {
-        return details.getOrDefault(rowIndex, Collections.emptyList());
+    public List<String> getReasonsForRow(int row) {
+        return details.getOrDefault(row, new ArrayList<>());
     }
 
-
-    
     public void merge(ValidationResult other) {
-        for (int row : other.details.keySet()) {
-            for (String reason : other.details.get(row)) {
-                addInvalidRow(row, reason);
-            }
+        for (Map.Entry<Integer, List<String>> entry : other.details.entrySet()) {
+            details.computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
+                   .addAll(entry.getValue());
         }
     }
-
-
     @Override
-    public String toString() {
-        if (allValid()) return "All rows are VALID.";
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("INVALID rows found: ").append(details.size()).append("\n");
-
-        for (int r : getInvalidRows()) {
-            for (String reason : details.get(r)) {
+public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (details.isEmpty()) {
+        sb.append("All rows valid");
+    } else {
+        for (int row : details.keySet()) {
+            for (String reason : details.get(row)) {
                 sb.append(reason).append("\n");
             }
         }
-        return sb.toString();
     }
+    return sb.toString();
+}
 }

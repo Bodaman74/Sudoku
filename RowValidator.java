@@ -1,45 +1,41 @@
 package sudoku;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RowValidator implements Validator {
-    private int[][] grid;
-    private int rowIndex;
+    private final int[][] board;
+    private final int rowIndex;
 
-    // Constructor with parameters
-    public RowValidator(int[][] grid, int rowIndex) {
-        this.grid = grid;
+    public RowValidator(int[][] board, int rowIndex) {
+        this.board = board;
         this.rowIndex = rowIndex;
     }
 
-   @Override
-public ValidationResult validate() {
-    ValidationResult result = new ValidationResult();
+    @Override
+    public ValidationResult validate() {
+        ValidationResult result = new ValidationResult();
+        int[] counts = new int[10]; // 1..9
 
-    int row = this.rowIndex;  // فقط الصف المخصص لهذه الـ instance
-    Map<Integer, List<Integer>> occurrences = new HashMap<>();
-    boolean added = false;
-
-    for (int col = 0; col < 9; col++) {
-        int val = grid[row][col];
-        if (val < 1 || val > 9) continue;
-
-        occurrences.putIfAbsent(val, new ArrayList<>());
-        occurrences.get(val).add(col + 1); // 1-based index
-    }
-
-    for (Map.Entry<Integer, List<Integer>> entry : occurrences.entrySet()) {
-        if (!added && entry.getValue().size() > 1) {
-            result.addInvalidRow(row + 1,
-                    "ROW " + (row + 1) + ", #" + entry.getKey() + ", " +
-                    entry.getValue());
-            added = true;
-            break;
+        // counts
+        for (int col = 0; col < 9; col++) {
+            int val = board[rowIndex][col];
+            if (val >= 1 && val <= 9)
+                counts[val]++;
         }
+
+        
+        for (int val = 1; val <= 9; val++) {
+            if (counts[val] > 1) {
+                List<Integer> positions = new ArrayList<>();
+                for (int col = 0; col < 9; col++) {
+                    if (board[rowIndex][col] == val) positions.add(col + 1);
+                }
+                result.addInvalidRow(rowIndex + 1,
+                        String.format("ROW %d, #%d, %s", rowIndex + 1, val, positions));
+            }
+        }
+
+        return result;
     }
-
-    return result;
-}
-
-
 }
